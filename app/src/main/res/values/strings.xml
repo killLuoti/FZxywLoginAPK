@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">校园网DL</string>
+    <string name="message_permission_always_failed">Please give us permission in the settings:\n\n%1$s</string>
+    <string name="title_dialog">Tips</string>
+    <string name="setting">Setting</string>
+    <string name="cancel">Cancel</string>
+    <string name="message_permission_rationale">Grant the following permissions to continue the program:\n\n%1$s</string>
+    <string name="resume">Resume</string>
+    <string name="sm">账号需加上后缀，电信@dx，移动@yd，联通@lt，校园网不需要后缀。例如xxxxxxx@dx</string>
+</resources>
