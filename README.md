@@ -2,4 +2,5 @@
 
 
 
-![Screenshot_1622801548](C:\Users\25427\Desktop\Screenshot_1622801548.png)
+![Screenshot_1622801548](https://github.com/killLuoti/FZxywLoginAPK/blob/main/Image/zhu.png)
+
