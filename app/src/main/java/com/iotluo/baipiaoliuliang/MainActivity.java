@@ -97,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
         editTextpwd.setText(password);
 
 
-
     }
 
 
@@ -182,9 +181,9 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             try {
-                                if (reper && !netutiltest.ping("114.114.114.114")) {
-                                    String ip = getWifiIp();
-                                    String wifiname = getWiFiName();
+                                String ip = getWifiIp();
+                                String wifiname = getWiFiName();
+                                if (reper && wifiname.equals("FZ-Student")) {
                                     String[] ips = null;
                                     Map<String, String> params = new HashMap<String, String>();
                                     params.put("DDDDD", ",1," + editTextname.getText().toString());
@@ -204,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
                                     params.put("cmd", "");
                                     params.put("Login", "");
                                     params.put("v6ip", "");
-                                    if (wifiname.equals("FZ-Student")) {
+                                    if (!netutiltest.ping("114.114.114.114")) {
                                         httpclass httpclass = new httpclass(url2);
                                         Log.d(TAG, "run: " + httpclass.get);
                                         Pattern pattern = Pattern.compile(patter);
@@ -222,28 +221,22 @@ public class MainActivity extends AppCompatActivity {
                                                             "&wlanacname=null&mac=00-00-00-00-00-00&ip=" + ip + "" +
                                                             "&enAdvert=0&queryACIP=0&jsVersion=2.4.3&loginMethod=1",
                                                     params, "utf-8");
+                                            Thread.sleep(200);
+                                            if (netutiltest.ping("114.114.114.114"))
+                                                Toast("可以上网了，草");
                                         } catch (Exception e) {
                                             e.printStackTrace();
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    Toast.makeText(MainActivity.this, "请重连WIFI", Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
+                                            Toast("请重连WIFI");
                                         }
                                         //                                    Log.d(TAG, "run: " + s);
 
                                     } else {
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                Toast.makeText(MainActivity.this, "WIFI连接错误", Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-                                        Log.d(TAG, "WIFI连接错误");
+                                        Toast("可以上网了，草");
                                     }
                                 } else {
                                     requestPermission(Permission.Group.LOCATION);
+                                    Toast("WIFI连接错误");
+                                    Log.d(TAG, "WIFI连接错误");
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -289,6 +282,16 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+    //Toast
+    private void Toast(String string){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this, string, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 
