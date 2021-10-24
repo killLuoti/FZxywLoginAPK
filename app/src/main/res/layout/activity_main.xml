@@ -54,7 +54,8 @@
         android:id="@+id/butdian"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:text="登录"/>
+        android:textSize="@dimen/permission_dp_20"
+        android:text="开启服务"/>
     <ProgressBar
         android:id="@+id/pgbzt"
         android:layout_width="match_parent"
@@ -78,7 +79,7 @@
         android:id="@+id/butwifi"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="使用说明"/>
+        android:text="获取自启动权限"/>
 <TextView
     android:text="@string/sm"
     android:layout_width="match_parent"

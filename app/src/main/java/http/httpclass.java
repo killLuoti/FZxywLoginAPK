@@ -36,6 +36,8 @@ public class httpclass {
             HttpURLConnection httpURLConnection =(HttpURLConnection)url.openConnection();
             httpURLConnection.setRequestMethod(method);
             httpURLConnection.connect();
+            int responseCode = httpURLConnection.getResponseCode();
+            Log.d(TAG, "obget: "+responseCode);
             if(200 == httpURLConnection.getResponseCode()){
 //                Log.d(TAG, "obget: "+httpURLConnection.getURL());
 //                BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(httpURLConnection.getInputStream()));

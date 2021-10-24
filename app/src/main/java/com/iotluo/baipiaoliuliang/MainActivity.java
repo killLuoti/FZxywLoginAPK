@@ -5,15 +5,22 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
@@ -21,6 +28,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.util.Log;
@@ -30,7 +38,9 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.xdandroid.hellodaemon.*;
 import org.apache.commons.lang3.StringEscapeUtils;
+
 
 import com.yanzhenjie.permission.Action;
 import com.yanzhenjie.permission.AndPermission;
@@ -46,12 +56,14 @@ import java.util.regex.Pattern;
 
 import NEThelpr.NetWorkHelper;
 import NetUtil.netutiltest;
+import SP.SharedP;
 import SharedPreferencesUtils.SharedPreferencesUtils;
 import http.httpclass;
+import sample.TraceServiceImpl;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "LLLL";
+    private static final String TAG = "luoluo";
     private static final String TODO = "TODO";
     private static final int REQUEST_CODE_SETTING = 1;
     private Button but1;
@@ -59,12 +71,10 @@ public class MainActivity extends AppCompatActivity {
     private EditText editTextname;
     private EditText editTextpwd;
     private ProgressBar pb;
-    private String url1 = "http://10.0.0.10:801/eportal/";
-    private String url2 = "http://10.10.10.10/";
-    private String patter = "\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b";
     private Context mContext;
     private boolean reper = false;//定位权限 ，默认值为未获得权限
-
+    private SimpleService.SimpleBinder mBinder;
+    private SharedP sharedP;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,16 +99,46 @@ public class MainActivity extends AppCompatActivity {
 //                            0);
 //        }
 //        读取用户名和密码
-        SharedPreferences sharedPre = getSharedPreferences("config", MODE_PRIVATE);
-        String username = sharedPre.getString("username", "");
-        String password = sharedPre.getString("password", "");
-
-        editTextname.setText(username);
-        editTextpwd.setText(password);
-
-
+        editTextname.setText(new SharedP(MainActivity.this).getUsername());
+        editTextpwd.setText(new SharedP(MainActivity.this).getPassword());
+        if(isWorked())
+        {but1.setText("关闭服务");}
     }
 
+    /*
+     * 是否健在
+     * */
+    public boolean isWorked()
+    {
+        ActivityManager myManager=(ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+        ArrayList<ActivityManager.RunningServiceInfo> runningService = (ArrayList<ActivityManager.RunningServiceInfo>) myManager.getRunningServices(30);
+        for(int i = 0 ; i<runningService.size();i++)
+        {
+            System.out.println(runningService.get(i).service.getClassName());
+            if(runningService.get(i).service.getClassName().toString().equals("sample.TraceServiceImpl"))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * bind
+     * **/
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d(TAG, "onServiceConnected: "+name);
+            mBinder =(SimpleService.SimpleBinder) service;
+            mBinder.doTask();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.d(TAG, "onServiceDisconnected: "+name);
+        }
+    };
 
     /**
      * Set permissions.
@@ -168,120 +208,42 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.butdian: {
                     Log.d(TAG, "onClick: dianle");
                     pb.setProgress(0);
-//                    SharedPreferencesUtils sharedPreferencesUtils =new SharedPreferencesUtils();
-                    //保存账号密码
-                    SharedPreferences sharedPre = getSharedPreferences("config", MODE_PRIVATE);
-                    //获取Editor对象
-                    SharedPreferences.Editor editor = sharedPre.edit();
-                    editor.putString("username", editTextname.getText().toString());
-                    editor.putString("password", editTextpwd.getText().toString());
-                    //提交
-                    editor.commit();
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                String ip = getWifiIp();
-                                String wifiname = getWiFiName();
-                                if (reper && wifiname.equals("FZ-Student")) {
-                                    String[] ips = null;
-                                    Map<String, String> params = new HashMap<String, String>();
-                                    params.put("DDDDD", ",1," + editTextname.getText().toString());
-                                    params.put("upass", editTextpwd.getText().toString());
-                                    params.put("R1", "0");
-                                    params.put("R2", "0");
-                                    params.put("R3", "0");
-                                    params.put("R6", "1");
-                                    params.put("para", "00");
-                                    params.put("0MKKey", "123456");
-                                    params.put("buttonClicked", "");
-                                    params.put("redirect_url", "");
-                                    params.put("err_flag", "");
-                                    params.put("username", "");
-                                    params.put("password", "");
-                                    params.put("user", "");
-                                    params.put("cmd", "");
-                                    params.put("Login", "");
-                                    params.put("v6ip", "");
-                                    if (!netutiltest.ping("114.114.114.114")) {
-                                        httpclass httpclass = new httpclass(url2);
-                                        Log.d(TAG, "run: " + httpclass.get);
-                                        Pattern pattern = Pattern.compile(patter);
-                                        Matcher matcher = pattern.matcher(httpclass.get);
-                                        List<String> list = new ArrayList<String>();
-                                        while (matcher.find()) {
-                                            //                                        Log.d(TAG, "run: "+matcher.group(0));
-                                            list.add(matcher.group(0));
-                                        }
-                                        try {
-                                            Log.d(TAG, "run: " + list.get(1));
-                                            String s = httpclass.submitPostData(url1 + "?c=ACSetting&a=Login" +
-                                                            "&protocol=http:&hostname=10.0.0.10&iTermType=8" +
-                                                            "&wlanuserip=" + ip + "&wlanacip=" + list.get(1) + "" +
-                                                            "&wlanacname=null&mac=00-00-00-00-00-00&ip=" + ip + "" +
-                                                            "&enAdvert=0&queryACIP=0&jsVersion=2.4.3&loginMethod=1",
-                                                    params, "utf-8");
-                                            Thread.sleep(200);
-                                            if (netutiltest.ping("114.114.114.114"))
-                                                Toast("可以上网了，草");
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                            Toast("请重连WIFI");
-                                        }
-                                        //                                    Log.d(TAG, "run: " + s);
+                    sharedP = new SharedP(MainActivity.this);
+                    sharedP.setUsername(editTextname.getText().toString());
+                    sharedP.setPassword(editTextpwd.getText().toString());
+                    sharedP.setSharedP();
+//                    String ip = getWifiIp();
+//                    String wifiname = getWiFiName();
+                    if(but1.getText().equals("开启服务")) {
+//                        Intent startIntent = new Intent(MainActivity.this, SimpleService.class);
+//                        startService(startIntent);
+                        TraceServiceImpl.sShouldStopService = false;
+                        DaemonEnv.startServiceMayBind(TraceServiceImpl.class);
+                        but1.setText("关闭服务");
+                    }
+                    else {
+//                        Intent stopIntent = new Intent(MainActivity.this, SimpleService.class);
+//                        stopService(stopIntent);
+                        TraceServiceImpl.stopService();
+                        but1.setText("开启服务");
+                    }
 
-                                    } else {
-                                        Toast("可以上网了，草");
-                                    }
-                                } else {
-                                    requestPermission(Permission.Group.LOCATION);
-                                    Toast("WIFI连接错误");
-                                    Log.d(TAG, "WIFI连接错误");
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    for (int i = 0; i < 10; i++) {
-                                        pb.incrementProgressBy(10);
-                                        try {
-                                            if (netutiltest.ping("114.114.114.114")) {
-                                                Toast.makeText(MainActivity.this, "可以上网了", Toast.LENGTH_SHORT).show();
-                                                pb.setProgress(100);
-                                                break;
-                                            }
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                    }).start();
                     break;
                 }
                 case R.id.butwifi: {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.d(TAG, "run: " + getWifiIp());
-                            Log.d(TAG, "run: " + getWiFiName());
-                        }
-                    }).start();
-                    if (netutiltest.isNetworkAvailable(MainActivity.this) == 1) {
-                        Log.d(TAG, "run: 222222222222222222222");
-                    }
-//                    getConnectWifiSsid();
-//                    Log.d(TAG, "onClick: wifi dianle");
-//                    NetWorkHelper.getInstance();
-//                    Log.d(TAG, "SSID: "+NetWorkHelper.getCurrentSsid(new MainActivity()));
-                    break;
+                    IntentWrapper.whiteListMatters(MainActivity.this, "校园网自动登录服务的持续运行");
                 }
             }
         }
 
+    }
+
+
+
+
+    //防止华为机型未加入白名单时按返回键回到桌面再锁屏后几秒钟进程被杀
+    public void onBackPressed() {
+        IntentWrapper.onBackPressed(this);
     }
 
     //Toast
@@ -295,44 +257,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    /*
-     * 获取 WiFi 的 IP 地址
-     * */
-    public String getWifiIp() {
-        Context myContext = getApplicationContext();
-        if (myContext == null) {
-            throw new NullPointerException("上下文 context is null");
-        }
-        WifiManager wifiMgr = (WifiManager) myContext.getSystemService(Context.WIFI_SERVICE);
-        if (isWifiEnabled()) {
-            int ipAsInt = wifiMgr.getConnectionInfo().getIpAddress();
-            String ip = Formatter.formatIpAddress(ipAsInt);
-            if (ipAsInt == 0) {
-                return "未能获取到IP地址";
-            } else {
-                return ip;
-            }
-        } else {
-            return "WiFi 未连接";
-        }
-    }
 
-    /*
-     * 获取 WIFI 的名称
-     * */
-    public String getWiFiName() {
-        WifiManager wm = ((WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE));
-        if (wm != null) {
-            WifiInfo winfo = wm.getConnectionInfo();
-            if (winfo != null) {
-                String s = winfo.getSSID();
-                if (s.length() > 2 && s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"') {
-                    return s.substring(1, s.length() - 1);
-                }
-            }
-        }
-        return "Wifi 未获取到";
-    }
+
+
 
     private String getConnectWifiSsid() {
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
@@ -343,26 +270,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    /*
-     * 判断当前 WIFI 是否连接
-     * */
-    public boolean isWifiEnabled() {
-        Context myContext = getApplicationContext();
-        if (myContext == null) {
-            throw new NullPointerException("上下文 context is null");
-        }
-        WifiManager wifiMgr = (WifiManager) myContext.getSystemService(Context.WIFI_SERVICE);
-        if (wifiMgr.getWifiState() == WifiManager.WIFI_STATE_ENABLED) {
-            ConnectivityManager connManager = (ConnectivityManager) myContext
-                    .getSystemService(Context.CONNECTIVITY_SERVICE);
 
-            NetworkInfo wifiInfo = connManager
-                    .getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-
-            return wifiInfo.isConnected();
-        } else {
-            return false;
-        }
-    }
 
 }

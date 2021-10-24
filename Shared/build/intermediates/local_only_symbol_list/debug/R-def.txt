@@ -1,0 +1,14 @@
+R_DEF: Internal format may change without notice
+local
+drawable earth
+drawable famous_fryer
+drawable ic_alarm_white_48dp
+drawable ic_cancel_white_48dp
+drawable ic_launcher
+drawable ic_message_black_18dp
+drawable ic_n_white_48dp
+drawable ic_person_black_48dp
+drawable ic_reply_white_18dp
+drawable me_macdonald
+drawable wendy_wonda
+string app_name
