@@ -80,6 +80,11 @@ public class IntentWrapper {
             //华为 自启管理
             Intent huaweiIntent = new Intent();
             huaweiIntent.setAction("huawei.intent.action.HSM_BOOTAPP_MANAGER");
+//            huaweiIntent.setAction("huawei.intent.action.HSM_PROTECTED_APPS");
+//            ComponentName componentName = ComponentName.unflattenFromString("com.huawei.systemmanager/.startupmgr.ui.StartupNormalAppListActivity");//跳自启动管理
+////            huaweiIntent.setAction("com.huawei.systemmanager");
+//            huaweiIntent.setComponent(componentName);
+//            huaweiIntent.setComponent(new ComponentName("com.huawei.systemmanager","com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity"));
             sIntentWrapperList.add(new IntentWrapper(huaweiIntent, HUAWEI));
 
             //华为 锁屏清理

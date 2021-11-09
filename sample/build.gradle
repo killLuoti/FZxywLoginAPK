@@ -22,7 +22,7 @@ android {
 }
 
 dependencies {
-    api 'io.reactivex.rxjava2:rxjava:2.+'
+    implementation "io.reactivex.rxjava2:rxjava:2.2.21"
     api project(':hellodaemon')
     implementation "com.android.support:support-compat:30.0.0"
 }

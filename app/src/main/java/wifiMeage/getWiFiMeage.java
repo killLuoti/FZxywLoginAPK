@@ -42,14 +42,14 @@ public class getWiFiMeage {
      *
      * 网络连接判断2
      * */
-    public static boolean isConnByHttp(){
+    public static boolean isConnByHttp(String Url){
         boolean isConn = false;
         URL url;
         HttpURLConnection conn = null;
         try {
-            url = new URL("http://10.150.2.21:8080/Self/dashboard");
+            url = new URL(Url);
             conn = (HttpURLConnection)url.openConnection();
-            conn.setConnectTimeout(1000*5);
+            conn.setConnectTimeout(1000);
             if(conn.getResponseCode()==200){
                 isConn = true;
             }
@@ -57,6 +57,7 @@ public class getWiFiMeage {
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            return false;
         }catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

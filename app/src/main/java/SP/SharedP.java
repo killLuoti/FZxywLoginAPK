@@ -9,19 +9,22 @@ public class SharedP {
     private String username;
     private String password;
     private Context con;
+    private String config;
+
 
     public SharedP(){}
-    public SharedP(Context con) {
+    public SharedP(Context con,String config) {
         //        读取用户名和密码
-        SharedPreferences sharedPre = con.getSharedPreferences("config", MODE_PRIVATE);
+        SharedPreferences sharedPre = con.getSharedPreferences(config, MODE_PRIVATE);
         this.con = con;
+        this.config = config;
         this.username = sharedPre.getString("username", "");
         this.password = sharedPre.getString("password", "");
     }
 
     public void setSharedP(){
         //保存账号密码
-        SharedPreferences sharedPre = con.getSharedPreferences("config", MODE_PRIVATE);
+        SharedPreferences sharedPre = con.getSharedPreferences(config, MODE_PRIVATE);
 
         //获取Editor对象
         SharedPreferences.Editor editor = sharedPre.edit();

@@ -29,15 +29,22 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.renderscript.ScriptGroup;
+import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.iotluo.baipiaoliuliang.vpnlibActivity.vpnLibActivity;
 import com.xdandroid.hellodaemon.*;
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -66,8 +73,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "luoluo";
     private static final String TODO = "TODO";
     private static final int REQUEST_CODE_SETTING = 1;
+    private CheckBox cb_xs;
     private Button but1;
-    private Button but2;
+    private Button but2,but_vpn;
     private EditText editTextname;
     private EditText editTextpwd;
     private ProgressBar pb;
@@ -80,29 +88,52 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         pb = findViewById(R.id.pgbzt);
+        cb_xs = findViewById(R.id.cb_xs);
         editTextname = findViewById(R.id.etname);
         editTextpwd = findViewById(R.id.etpwd);
         but1 = findViewById(R.id.butdian);
         but1.setOnClickListener(new onclick());
         but2 = findViewById(R.id.butwifi);
         but2.setOnClickListener(new onclick());
-        requestPermission(Permission.Group.LOCATION);
-//        //存储权限
-//        if(ContextCompat.checkSelfPermission
-//                (this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                != PackageManager.PERMISSION_GRANTED)
-//        //根据返回的结果，判断对应的权限是否有。
-//        {
-//            ActivityCompat.requestPermissions
-//                    (this,
-//                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-//                            0);
-//        }
+        but_vpn = findViewById(R.id.but_vpn);
+        but_vpn.setOnClickListener(new onclick());
+        requestPermission(this);
+        cb_xs.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    editTextpwd.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                    editTextpwd.setSelection(editTextpwd.getText().length());
+                }else {
+                    editTextpwd.setInputType(InputType.TYPE_CLASS_TEXT |InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    editTextpwd.setSelection(editTextpwd.getText().length());
+                }
+            }
+        });
+        editTextpwd.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                sharedP = new SharedP(MainActivity.this,"config");
+                sharedP.setUsername(editTextname.getText().toString());
+                sharedP.setPassword(editTextpwd.getText().toString());
+                sharedP.setSharedP();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 //        读取用户名和密码
-        editTextname.setText(new SharedP(MainActivity.this).getUsername());
-        editTextpwd.setText(new SharedP(MainActivity.this).getPassword());
-        if(isWorked())
-        {but1.setText("关闭服务");}
+        editTextname.setText(new SharedP(MainActivity.this,"config").getUsername());
+        editTextpwd.setText(new SharedP(MainActivity.this,"config").getPassword());
+//        if(isWorked())
+//        {but1.setText("关闭服务");}
     }
 
     /*
@@ -150,6 +181,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Display setting dialog.
+     * 多次拒绝权限后触发跳转设置界面
      */
     public void showSettingDialog(Context context, final List<String> permissions) {
         List<String> permissionNames = Permission.transformText(context, permissions);
@@ -176,11 +208,11 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Request permissions.
      */
-    private void requestPermission(@PermissionDef String... permissions) {
-        AndPermission.with(this)
+    private void requestPermission(Context con) {
+        AndPermission.with(con)
                 .runtime()
-                .permission(permissions)
-                .rationale(new com.iotluo.baipiaoliuliang.RuntimeRationale())
+                .permission(Permission.Group.LOCATION,Permission.Group.STORAGE)
+                .rationale(new RuntimeRationale())
                 .onGranted(new Action<List<String>>() {
                     @Override
                     public void onAction(List<String> permissions) {
@@ -191,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
                 .onDenied(new Action<List<String>>() {
                     @Override
                     public void onAction(@NonNull List<String> permissions) {
-                        Toast.makeText(MainActivity.this, "请允许权限", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(MainActivity.this, "请允许权限", Toast.LENGTH_SHORT).show();
                         reper = false;
                         if (AndPermission.hasAlwaysDeniedPermission(MainActivity.this, permissions)) {
                             showSettingDialog(MainActivity.this, permissions);
@@ -206,32 +238,37 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.butdian: {
+                    requestPermission(MainActivity.this);
                     Log.d(TAG, "onClick: dianle");
                     pb.setProgress(0);
-                    sharedP = new SharedP(MainActivity.this);
-                    sharedP.setUsername(editTextname.getText().toString());
-                    sharedP.setPassword(editTextpwd.getText().toString());
-                    sharedP.setSharedP();
 //                    String ip = getWifiIp();
 //                    String wifiname = getWiFiName();
-                    if(but1.getText().equals("开启服务")) {
-//                        Intent startIntent = new Intent(MainActivity.this, SimpleService.class);
-//                        startService(startIntent);
-                        TraceServiceImpl.sShouldStopService = false;
-                        DaemonEnv.startServiceMayBind(TraceServiceImpl.class);
-                        but1.setText("关闭服务");
-                    }
-                    else {
-//                        Intent stopIntent = new Intent(MainActivity.this, SimpleService.class);
-//                        stopService(stopIntent);
-                        TraceServiceImpl.stopService();
-                        but1.setText("开启服务");
-                    }
-
+//                    if(but1.getText().equals("开启服务")) {
+////                        Intent startIntent = new Intent(MainActivity.this, SimpleService.class);
+////                        startService(startIntent);
+//                        TraceServiceImpl.sShouldStopService = false;
+//                        DaemonEnv.startServiceMayBind(TraceServiceImpl.class);
+//                        but1.setText("关闭服务");
+//                    }
+//                    else {
+////                        Intent stopIntent = new Intent(MainActivity.this, SimpleService.class);
+////                        stopService(stopIntent);
+//                        TraceServiceImpl.stopService();
+//                        but1.setText("开启服务");
+//                    }
+                    TraceServiceImpl.sShouldStopService = false;
+                    DaemonEnv.startServiceMayBind(TraceServiceImpl.class);
                     break;
                 }
                 case R.id.butwifi: {
+                    pb.setProgress(100);
                     IntentWrapper.whiteListMatters(MainActivity.this, "校园网自动登录服务的持续运行");
+                    break;
+                }
+                case R.id.but_vpn:{
+                    Intent intent = new Intent(MainActivity.this, vpnLibActivity.class);
+                    startActivity(intent);
+                    break;
                 }
             }
         }

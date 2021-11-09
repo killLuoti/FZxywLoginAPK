@@ -1,2 +1,2 @@
-include ':app',':hellodaemon',':sample',':Shared'
+include ':app',':hellodaemon',':sample',':Shared',':vpnLib'
 rootProject.name = "baipiaoliuliang"

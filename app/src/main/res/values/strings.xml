@@ -1,10 +1,37 @@
 <resources>
-    <string name="app_name">CNAL</string>
-    <string name="message_permission_always_failed">Please give us permission in the settings:\n\n%1$s</string>
-    <string name="title_dialog">Tips</string>
-    <string name="setting">Setting</string>
-    <string name="cancel">Cancel</string>
-    <string name="message_permission_rationale">Grant the following permissions to continue the program:\n\n%1$s</string>
-    <string name="resume">Resume</string>
-    <string name="sm">账号需加上后缀，电信@dx，移动@yd，联通@lt，校园网不需要后缀。例如xxxxxxx@dx</string>
+    <string name="app_name">校园网</string>
+    <string name="message_permission_always_failed">请在以下设置中给予我们权限：\n\n%1$s</string>
+    <string name="title_dialog">提示</string>
+    <string name="setting">设置</string>
+    <string name="cancel">取消</string>
+    <string name="message_permission_rationale">授予以下权限以继续该程序：\n\n%1$s</string>
+    <string name="resume">继续</string>
+    <string name="sm">账号需加上后缀，电信@dx，移动@yd，联通@lt，校园网不需要后缀。例如xxxxxxx@dx\n\n只要设置好了账号密码理论上不再打开该程序也能自动登录\n\n</string>
+    <string name="vpn">VPN按钮为团队专用。本软件仅供学习交流，如作他用所承受的法律责任一概与作者无关（下载使用即代表你同意上述观点）</string>
+    <string name="but_start">连接</string>
+    <string name="but_stop">断开</string>
+    <string name="title_activity_vpn_navigation">vpnNavigationActivity</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="title_activity_vpn_nav">vpnNavActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+
+    <string name="vpn_on">VPN ON</string>
+    <string name="vpn_off">VPN OFF</string>
+    <string name="navigation_drawer_open">drawer open</string>
+    <string name="navigation_drawer_close">drawer close</string>
+    <string name="connect">开始连接</string>
+    <string name="connecting">连接中</string>
+    <string name="disconnect">断开</string>
+    <string name="connection_close_confirm">是否要断开当前连接？</string>
+    <string name="yes">是</string>
+    <string name="no">否</string>
 </resources>

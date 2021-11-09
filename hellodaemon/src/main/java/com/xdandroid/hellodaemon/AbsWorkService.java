@@ -3,16 +3,21 @@ package com.xdandroid.hellodaemon;
 import android.app.*;
 import android.content.*;
 import android.content.pm.*;
+import android.graphics.BitmapFactory;
 import android.os.*;
 import android.annotation.*;
 
-import org.jetbrains.annotations.Nullable;
+import androidx.core.app.NotificationCompat;
+
+//import org.jetbrains.annotations.Nullable;
+
 
 public abstract class AbsWorkService extends Service {
 
     protected static final int HASH_CODE = 1;
 
     protected boolean mFirstStarted = true;
+
 
     /**
      * 用于在不需要服务运行的时候取消 Job / Alarm / Subscription.
@@ -34,7 +39,6 @@ public abstract class AbsWorkService extends Service {
      * @return 任务正在运行, true; 任务当前不在运行, false; 无法判断, 什么也不做, null.
      */
     public abstract Boolean isWorkRunning(Intent intent, int flags, int startId);
-    @Nullable
     public abstract IBinder onBind(Intent intent, Void alwaysNull);
     public abstract void onServiceKilled(Intent rootIntent);
 
@@ -104,7 +108,6 @@ public abstract class AbsWorkService extends Service {
         return onStart(intent, flags, startId);
     }
 
-    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         onStart(intent, 0, 0);

@@ -34,6 +34,7 @@ public class httpclass {
         try {
             url =new URL(Url);
             HttpURLConnection httpURLConnection =(HttpURLConnection)url.openConnection();
+            httpURLConnection.setConnectTimeout(1000);
             httpURLConnection.setRequestMethod(method);
             httpURLConnection.connect();
             int responseCode = httpURLConnection.getResponseCode();
@@ -99,7 +100,7 @@ public class httpclass {
         try {
             url =new URL(Url);
             HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
-            httpURLConnection.setConnectTimeout(3000);        //设置连接超时时间
+            httpURLConnection.setConnectTimeout(2000);        //设置连接超时时间
             httpURLConnection.setDoInput(true);                  //打开输入流，以便从服务器获取数据
             httpURLConnection.setDoOutput(true);                 //打开输出流，以便向服务器提交数据
             httpURLConnection.setRequestMethod("POST");     //设置以Post方式提交数据
