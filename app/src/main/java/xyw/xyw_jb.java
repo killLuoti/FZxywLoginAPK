@@ -106,7 +106,7 @@ public class xyw_jb {
             @Override
             public void run() {
                 Looper.prepare();
-                Toast.makeText(con, s, Toast.LENGTH_SHORT).show();
+                Toast.makeText(con, s, Toast.LENGTH_LONG).show();
                 Looper.loop();//这种情况下，Runnable对象是运行在子线程中的，可以进行联网操作，但是不能更新UI
             }
         }).start();

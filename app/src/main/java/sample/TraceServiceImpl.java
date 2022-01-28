@@ -1,10 +1,12 @@
 package sample;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.*;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -12,6 +14,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.*;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -20,7 +23,12 @@ import androidx.core.graphics.drawable.IconCompat;
 
 import com.iotluo.baipiaoliuliang.MainActivity;
 import com.iotluo.baipiaoliuliang.R;
+import com.iotluo.baipiaoliuliang.Service.BootstarpService;
+import com.iotluo.baipiaoliuliang.Service.NotificationUtil;
+import com.iotluo.baipiaoliuliang.Service.PushService;
+import com.tapadoo.alerter.Alerter;
 import com.xdandroid.hellodaemon.*;
+import com.yanzhenjie.permission.Boot;
 
 import java.util.concurrent.*;
 
@@ -40,6 +48,7 @@ public class TraceServiceImpl extends AbsWorkService {
     private String text;
     private String url2 = "http://10.10.10.10/";
     private String url3 = "http://10.150.2.21:8080/Self/dashboard";
+
     public static void stopService() {
         //我们现在不再需要服务运行了, 将标志位置为 true
         sShouldStopService = true;
@@ -63,63 +72,37 @@ public class TraceServiceImpl extends AbsWorkService {
         context = getApplicationContext();
         super.onCreate();
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stopForeground(true);
+    }
+
     public void tongzhi(String text){
         if(this.text==text){return;}else {
-        this.text = text;
-        tongzhi(text, "通知");}
-    }
-    public  void tongzhi(String text, String title){
-        //增加一個渠道，ID不重复即可
-        String CHANNEL_ID = "fspt.net";
-        String CHANNEL_NAME = "新消息通知";
-        String description = "校园网自动登录程序";
-        int notifiId = (int) System.currentTimeMillis();
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//Android 8.0需要增加渠道
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Log.d("luoluo", "tongzhi: #####");
-            @SuppressLint("WrongConstant")
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
-            channel.setDescription(description);
-            channel.setLightColor(Color.RED);
-            channel.enableVibration(true);
-            channel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
-            notificationManager.createNotificationChannel(channel);
-        }
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this,CHANNEL_ID);
-        if(Build.VERSION.SDK_INT<Build.VERSION_CODES.LOLLIPOP){
-            //如果是小于5.0系统的，设置原图
-            notificationBuilder.setSmallIcon(R.drawable.ic_action_name);
-        }else{
-            //如果是大于等于5.0系统的，设置透明图
-            notificationBuilder.setSmallIcon(R.drawable.ic_action_name);
-            if(Build.VERSION.SDK_INT<Build.VERSION_CODES.N){
-                //如果小于7.0系统,设置背景色
-                notificationBuilder.setColor(Color.RED);
+            this.text = text;
+            //通知1
+//        BootstarpService.text = text;
+            if (MainActivity.getContext() != null) {
+                NotificationUtil.sendNotification(MainActivity.getContext(), "新消息通知",
+                        "校园网自动登录程序", "通知", text);
             }
         }
 
 
-        // Create an explicit intent for an Activity in your app
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-
-
-
-        notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-        notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-        notificationBuilder.setContentIntent(pendingIntent);
-        notificationBuilder.setContentTitle(title);
-        notificationBuilder.setContentText(text);
-        notificationBuilder.setTicker(text);
-        notificationBuilder.setAutoCancel(true);//点击之后消失
-        notificationBuilder.setSound(defaultSoundUri);
-        notificationBuilder.setWhen(System.currentTimeMillis());
-        notificationBuilder.setDefaults( Notification.DEFAULT_VIBRATE | Notification.DEFAULT_ALL | Notification.DEFAULT_SOUND );
-//        notificationManager.notify(notifiId, notificationBuilder.build());
-        startForeground(notifiId, notificationBuilder.build());
+        // start BootstrapService to remove notification
+//        Intent intent = new Intent(this, BootstarpService.class);
+////        intent.setAction("com.android.iotluo");
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                //android8.0以上通过startForegroundService启动service
+//                startForegroundService(intent);
+//                Log.d("luoluo", "Android8以上启动服务 ");
+//            } else {
+//                startService(intent);
+//                Log.d("luoluo", "Android8以下启动服务 ");
+//            }
+//        }
     }
 
 
@@ -136,7 +119,7 @@ public class TraceServiceImpl extends AbsWorkService {
                 })
                 .subscribe(count -> {
                     getWiFiMeage getWiFiMeage = new getWiFiMeage(this);
-                    if (getWiFiMeage.getWiFiName().equals("FZ-Student")) {
+                    if (getWiFiMeage.getWiFiName().equals("FZ-Student")) { //FZ-Student
                         if (!getWiFiMeage.isConnByHttp(url3)&& getWiFiMeage.isConnByHttp(url2)) {
                             String name = new SharedP(this,"config").getUsername();
                             String pwd = new SharedP(this,"config").getPassword();

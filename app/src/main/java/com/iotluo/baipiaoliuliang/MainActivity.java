@@ -44,6 +44,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.iotluo.baipiaoliuliang.Service.NotificationUtil;
 import com.iotluo.baipiaoliuliang.vpnlibActivity.vpnLibActivity;
 import com.xdandroid.hellodaemon.*;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -71,7 +72,6 @@ import sample.TraceServiceImpl;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "luoluo";
-    private static final String TODO = "TODO";
     private static final int REQUEST_CODE_SETTING = 1;
     private CheckBox cb_xs;
     private Button but1;
@@ -83,6 +83,12 @@ public class MainActivity extends AppCompatActivity {
     private boolean reper = false;//定位权限 ，默认值为未获得权限
     private SimpleService.SimpleBinder mBinder;
     private SharedP sharedP;
+    private static Context sContext = null;
+
+    public static Context getContext() {
+        return sContext;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
         but_vpn = findViewById(R.id.but_vpn);
         but_vpn.setOnClickListener(new onclick());
         requestPermission(this);
+        sContext = this;
         cb_xs.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

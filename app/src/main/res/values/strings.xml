@@ -7,7 +7,7 @@
     <string name="message_permission_rationale">授予以下权限以继续该程序：\n\n%1$s</string>
     <string name="resume">继续</string>
     <string name="sm">账号需加上后缀，电信@dx，移动@yd，联通@lt，校园网不需要后缀。例如xxxxxxx@dx\n\n只要设置好了账号密码理论上不再打开该程序也能自动登录\n\n</string>
-    <string name="vpn">VPN按钮为团队专用。本软件仅供学习交流，如作他用所承受的法律责任一概与作者无关（下载使用即代表你同意上述观点）</string>
+    <string name="vpn">信团福利为团队专用。本软件仅供学习交流，如作他用所承受的法律责任一概与作者无关（下载使用即代表你同意上述观点）\r\n1.3.4</string>
     <string name="but_start">连接</string>
     <string name="but_stop">断开</string>
     <string name="title_activity_vpn_navigation">vpnNavigationActivity</string>
